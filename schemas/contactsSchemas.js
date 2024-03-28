@@ -15,4 +15,10 @@ const createContactSchema = Joi.object({
   phone: Joi.string().required(),
 });
 
-module.exports = { createContactSchema };
+const updateContactSchema = Joi.object({
+  name: Joi.string(),
+  email: Joi.string(),
+  phone: Joi.string(),
+});
+
+module.exports = { createContactSchema, updateContactSchema };
