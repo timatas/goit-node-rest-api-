@@ -1,9 +1,7 @@
-const MyHttpError = require("./myHttpError");
+const HttpError = require("./HttpError");
 const ctrlWrapper = require("./ctrlWrapper");
-const myValidateBody = require("./myValidateBody");
 
 module.exports = {
-  MyHttpError,
+  HttpError,
   ctrlWrapper,
-  myValidateBody,
 };
