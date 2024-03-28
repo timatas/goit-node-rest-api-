@@ -1,8 +1,4 @@
-//import contactsService from "../services/contactsServices.js";
-//const Joi = require("joi");
-
 const contacts = require("../services/contactsServices");
-//const contacts = require("../contacts/contacts.json");
 
 const { HttpError, ctrlWrapper } = require("../helpers");
 
@@ -26,9 +22,7 @@ const deleteContact = async (req, res) => {
   if (!result) {
     throw HttpError(404, "Not found");
   }
-  res.json({
-    message: "Delete is success",
-  });
+  res.json(result);
 };
 
 const createContact = async (req, res) => {
@@ -37,6 +31,10 @@ const createContact = async (req, res) => {
 };
 
 const updateContact = async (req, res) => {
+  if (Object.keys(req.body).length === 0) {
+    throw HttpError(404, "Body must have at least one field");
+  }
+
   const { id } = req.params;
   const result = await contacts.updateContact(id, req.body);
   if (!result) {

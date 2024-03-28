@@ -20,7 +20,7 @@ contactsRouter.post(
 
 contactsRouter.put(
   "/:id",
-  validateBody(schemas.createContactSchema),
+  validateBody(schemas.updateContactSchema),
   ctrl.updateContact
 );
 
