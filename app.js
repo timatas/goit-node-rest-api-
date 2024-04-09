@@ -1,14 +1,10 @@
-const express = require("express");
 const cors = require("cors");
-// const mongoose = require("mongoose");
+const express = require("express");
+const mongoose = require("mongoose");
+const morgan = require("morgan");
+require("dotenv").config(); //const dotenv = require("dotenv");dotenv.config();
 
 const contactsRouter = require("./routes/contactsRouter");
-// const DB_HOST =
-//   "mongodb+srv://Nfyz1974:Nfyz1974@cluster0.s5u1jyx.mongodb.net/db_contacts?retryWrites=true&w=majority&appName=Cluster0";
-// mongoose
-//   .connect(DB_HOST)
-//   .then(() => console.log("Database connection successful"))
-//   .catch((error) => console.log(error.message));
 
 // mongoose.connect(process.env.DB_HOST, {
 //   useNewUrlParser: true,
@@ -16,6 +12,17 @@ const contactsRouter = require("./routes/contactsRouter");
 //   useUnifiedTopology: true,
 // });
 const app = express();
+
+mongoose
+  .connect(process.env.DB_HOST)
+  .then(() => console.log("Database connection successful"))
+  .catch((error) => {
+    console.log(error.message);
+    process.exit(1);
+  });
+
+if (process.env.NODE_ENV === "development") app.use(morgan("dev"));
+
 app.use(cors());
 app.use(express.json());
 
@@ -34,6 +41,6 @@ app.use((err, req, res, next) => {
   });
 });
 
-// app.listen(3000);
+app.listen(3000);
 
 module.exports = app;

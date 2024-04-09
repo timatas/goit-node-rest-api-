@@ -26,4 +26,10 @@ contactsRouter.put(
 
 contactsRouter.delete("/:id", ctrl.deleteContact);
 
+contactsRouter.patch(
+  "/:contactId/favorite",
+  validateBody(schemas.updateFavoriteSchema),
+  ctrl.updateStatus
+);
+
 module.exports = contactsRouter;
