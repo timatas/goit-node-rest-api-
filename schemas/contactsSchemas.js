@@ -1,12 +1,3 @@
-// import Joi from "joi";
-
-// export const createContactSchema = Joi.object({
-
-// })
-
-// export const updateContactSchema = Joi.object({
-
-// })
 const Joi = require("joi");
 
 const createContactSchema = Joi.object({
@@ -21,4 +12,12 @@ const updateContactSchema = Joi.object({
   phone: Joi.string(),
 });
 
-module.exports = { createContactSchema, updateContactSchema };
+const updateFavoriteSchema = Joi.object({
+  favorite: Joi.boolean(),
+});
+
+module.exports = {
+  createContactSchema,
+  updateContactSchema,
+  updateFavoriteSchema,
+};

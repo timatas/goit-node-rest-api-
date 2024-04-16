@@ -1,60 +1,55 @@
-const fs = require("fs/promises");
-const path = require("path");
-const { nanoid } = require("nanoid");
+const { Contact } = require("../models/contactModel.js");
 
-const contactsPath = path.join(__dirname, "contacts.json");
-
-async function listContacts() {
-  const list = await fs.readFile(contactsPath);
-  return JSON.parse(list);
+// Повертає масив контактів
+async function listContacts(req) {
+  const { _id: owner } = req.user;
+  const { page = 1, limit = 20 } = req.query;
+  const skip = (page - 1) * limit;
+  const list = await Contact.find({ owner }, "-createdAt -updatedAt", {
+    skip,
+    limit,
+  }).populate("owner", "name email");
+  return list;
 }
 
+//Повертає об'єкт контакту з таким id. Повертає null, якщо контакт з таким id не знайдений
 async function getContactById(id) {
-  const contacts = await listContacts();
-  const result = contacts.find((item) => item.id === id);
+  const result = await Contact.findById(id);
   return result || null;
 }
 
-async function addContact(data) {
-  const contacts = await listContacts();
-  const newContact = {
-    id: nanoid(),
-    ...data,
-  };
-  contacts.push(newContact);
-  await fs.writeFile(contactsPath, JSON.stringify(contacts, null, 2));
+//Додає новий об'єкт контакту
+async function addContact(...data) {
+  const newContact = new Contact(...data);
+  await newContact.save();
   return newContact;
 }
 
+//Оновлення контакту
 async function updateContact(id, data) {
-  const contacts = await listContacts();
-  const index = contacts.findIndex((item) => item.id === id);
-  if (index === -1) {
-    return null;
-  }
-  if (data.name) {
-    contacts[index].name = data.name;
-  }
-  if (data.email) {
-    contacts[index].email = data.email;
-  }
-  if (data.phone) {
-    contacts[index].phone = data.phone;
-  }
-
-  await fs.writeFile(contactsPath, JSON.stringify(contacts, null, 2));
-  return contacts[index];
+  const updatedContact = await Contact.findByIdAndUpdate(id, data, {
+    new: true,
+  });
+  return updatedContact;
 }
 
+//Повертає об'єкт видаленого контакту. Повертає null, якщо контакт з таким id не знайдений
 async function removeContact(id) {
-  const contacts = await listContacts();
-  const index = contacts.findIndex((item) => item.id === id);
-  if (index === -1) {
-    return null;
-  }
-  const [result] = contacts.splice(index, 1);
-  await fs.writeFile(contactsPath, JSON.stringify(contacts, null, 2));
+  const result = await Contact.findByIdAndDelete(id);
   return result;
+}
+
+//повертає оновлений об'єкт контакту
+async function updateStatusContact(contactId, body) {
+  const { favorite } = body;
+  const updatedContact = await Contact.findByIdAndUpdate(
+    contactId,
+    {
+      favorite,
+    },
+    { new: true }
+  );
+  return updatedContact;
 }
 
 module.exports = {
@@ -63,4 +58,5 @@ module.exports = {
   addContact,
   updateContact,
   removeContact,
+  updateStatusContact,
 };
