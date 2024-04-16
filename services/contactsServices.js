@@ -1,8 +1,14 @@
 const { Contact } = require("../models/contactModel.js");
 
 // Повертає масив контактів
-async function listContacts() {
-  const list = await Contact.find();
+async function listContacts(req) {
+  const { _id: owner } = req.user;
+  const { page = 1, limit = 20 } = req.query;
+  const skip = (page - 1) * limit;
+  const list = await Contact.find({ owner }, "-createdAt -updatedAt", {
+    skip,
+    limit,
+  }).populate("owner", "name email");
   return list;
 }
 
