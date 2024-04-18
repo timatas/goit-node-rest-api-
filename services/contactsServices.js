@@ -12,9 +12,10 @@ async function listContacts(req) {
   return list;
 }
 
-//Повертає об'єкт контакту з таким id. Повертає null, якщо контакт з таким id не знайдений
-async function getContactById(id) {
-  const result = await Contact.findById(id);
+//Повертає об'єкт контакту з таким id авторизованому користувачу.
+async function getContactById(id, req) {
+  const { _id: owner } = req.user;
+  const result = await Contact.findOne({ _id: id, owner });
   return result || null;
 }
 
@@ -25,30 +26,40 @@ async function addContact(...data) {
   return newContact;
 }
 
-//Оновлення контакту
-async function updateContact(id, data) {
-  const updatedContact = await Contact.findByIdAndUpdate(id, data, {
-    new: true,
-  });
+//Оновлення контакту авторизованим користувачем
+async function updateContact(id, req, data) {
+  const { _id: owner } = req.user;
+  const updatedContact = await Contact.findOneAndUpdate(
+    { _id: id, owner },
+    data,
+    {
+      new: true,
+    }
+  );
   return updatedContact;
 }
 
 //Повертає об'єкт видаленого контакту. Повертає null, якщо контакт з таким id не знайдений
-async function removeContact(id) {
-  const result = await Contact.findByIdAndDelete(id);
+async function removeContact(id, req) {
+  const { _id: owner } = req.user;
+  const result = await Contact.findOneAndDelete({ _id: id, owner });
   return result;
 }
 
-//повертає оновлений об'єкт контакту
-async function updateStatusContact(contactId, body) {
+//повертає оновлений статус об'єкт контакту
+async function updateStatusContact(contactId, req, body) {
+  const { _id: owner } = req.user;
   const { favorite } = body;
-  const updatedContact = await Contact.findByIdAndUpdate(
-    contactId,
+  const updatedContact = await Contact.findOneAndUpdate(
+    { _id: contactId, owner },
     {
       favorite,
     },
-    { new: true }
+    {
+      new: true,
+    }
   );
+
   return updatedContact;
 }
 

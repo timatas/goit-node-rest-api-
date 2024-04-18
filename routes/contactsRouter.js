@@ -32,7 +32,6 @@ contactsRouter.delete("/:id", authenticate, isValidId, ctrl.deleteContact);
 contactsRouter.patch(
   "/:contactId/favorite",
   authenticate,
-  isValidId,
   validateBody(schemas.updateFavoriteSchema),
   ctrl.updateStatus
 );

@@ -3,14 +3,17 @@ const contacts = require("../services/contactsServices");
 const { HttpError, ctrlWrapper } = require("../helpers");
 
 const getAllContacts = async (req, res) => {
-  const result = await contacts.listContacts(req);
+  const { _id: owner } = req.user;
+  const result = await contacts.listContacts(req, owner);
 
   res.json(result);
 };
 
+//Повертає один контакт авторизованого користувача
 const getOneContact = async (req, res) => {
   const { id } = req.params;
-  const result = await contacts.getContactById(id);
+  const result = await contacts.getContactById(id, req);
+
   if (!result) {
     throw HttpError(404, "Not found");
   }
@@ -19,7 +22,7 @@ const getOneContact = async (req, res) => {
 
 const deleteContact = async (req, res) => {
   const { id } = req.params;
-  const result = await contacts.removeContact(id);
+  const result = await contacts.removeContact(id, req);
   if (!result) {
     throw HttpError(404, "Not found");
   }
@@ -32,23 +35,25 @@ const createContact = async (req, res) => {
   res.status(201).json(result);
 };
 
+//Оновлення контакту авторизованим користувачем
 const updateContact = async (req, res) => {
   if (Object.keys(req.body).length === 0) {
     throw HttpError(404, "Body must have at least one field");
   }
 
   const { id } = req.params;
-  const result = await contacts.updateContact(id, req.body);
+  const result = await contacts.updateContact(id, req, req.body);
   if (!result) {
     throw HttpError(404, "Not found");
   }
   res.json(result);
 };
 
+//Оновлення статусу контакту авторизованим користувачем
 const updateStatus = async (req, res) => {
   const { contactId } = req.params;
   const { favorite } = req.body;
-  const updatedContact = await contacts.updateStatusContact(contactId, {
+  const updatedContact = await contacts.updateStatusContact(contactId, req, {
     favorite,
   });
   if (!updatedContact) throw HttpError(404, "Not found");
