@@ -2,7 +2,7 @@ const express = require("express");
 
 const ctrl = require("../controllers/authControllers");
 
-const { validateBody, authenticate } = require("../middleware");
+const { validateBody, authenticate, upload } = require("../middleware");
 
 const { schemas } = require("../models/userModel");
 
@@ -23,5 +23,13 @@ authRouter.get("/current", authenticate, ctrl.getCurrent);
 
 //logout
 authRouter.post("/logout", authenticate, ctrl.logout);
+
+//upload user`s avatar
+authRouter.patch(
+  "/avatars",
+  authenticate,
+  upload.single("avatar"),
+  ctrl.updateAvatar
+);
 
 module.exports = authRouter;
